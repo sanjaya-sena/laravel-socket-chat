@@ -20,17 +20,19 @@
 
     <div class="container" id="app">
         <div class="row">
-            <div class="offset-4 col-4">
+            <div class="offset-4 col-4 col-sm-8 offset-sm-2">
                 <li class="list-group-item active">Chat Room</li>
                 <ul class="list-group" v-chat-scroll>
                     <message
-                            v-for="value in chat.message"
+                            v-for="value, index in chat.message"
                             :key="value.index"
-                            color='success'
+                            :color=chat.color[index]
+                            :user=chat.user[index]
                     >
                         @{{ value }}
                     </message>
                 </ul>
+                <small>@{{ typing }}</small>
                 <input type="text" class="form-control" placeholder="Type your message here..." v-model="message" @keyup.enter="send">
             </div>
         </div>

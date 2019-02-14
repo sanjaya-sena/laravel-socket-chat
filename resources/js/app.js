@@ -15,15 +15,48 @@ const app = new Vue({
     data: {
         message:'',
         chat:{
-            message:[]
+            message:[],
+            user:[],
+            color:[]
+        },
+        typing:''
+    },
+    watch:{
+        message(){
+            Echo.private('chat')
+                .whisper('typing', {
+                    name: this.message
+                });
         }
     },
     methods:{
         send(){
             if (this.message.length){
                 this.chat.message.push(this.message);
-                this.message = '';
+                this.chat.user.push('you');
+                this.chat.color.push('success');
+                axios.post('/send',{
+                    message:this.message
+                }).then(response=>{
+                    console.log(response);
+                    this.message = '';
+                }).catch(err=>console.log(err));
             }
         }
+    },
+    mounted(){
+        Echo.private('chat')
+            .listen('ChatEvent', (e) => {
+                this.chat.message.push(e.message);
+                this.chat.user.push(e.user);
+                this.chat.color.push('info')
+            })
+            .listenForWhisper('typing', (e) => {
+                if (e.name){
+                    this.typing = 'typing...';
+                }else {
+                    this.typing = '';
+                }
+            });
     }
 });
